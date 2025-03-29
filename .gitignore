@@ -1,0 +1,17 @@
+# OCaml compiled files
+*.cmo
+*.cmi
+*.cmx
+*.o
+
+# Executable produced by make (e.g., my_parser)
+my_parser
+
+# Generated files from ocamlyacc and ocamllex
+parser.ml
+parser.mli
+lexer.ml
+
+# Backup files
+*~
+\#*#

@@ -1,18 +1,10 @@
 
 Parsed AST:
-matrix int m1 := MatrixInt((2, 2), ...);
-int det := Determinant(m1);
-If(Not(Eq(det, 0)), Block(float det_inv := Div(1., det); float a := m1[0][0]; float b := m1[0][1]; float c := m1[1][0]; float d := m1[1][1]; float neg_b := Neg(b); float neg_c := Neg(c); matrix float adj := MatrixFloat((2, 2), ...); adj[0][0] := d; adj[0][1] := neg_b; adj[1][0] := neg_c; adj[1][1] := a; matrix float m_inv := ScalarMultiply(det_inv, adj); float inv_00 := m_inv[0][0]; float inv_01 := m_inv[0][1]; float inv_10 := m_inv[1][0]; float inv_11 := m_inv[1][1]; print(inv_00); print(inv_01); print(inv_10); print(inv_11); matrix float m1_float := MatrixFloat((2, 2), ...); matrix float result := MultiplyM(m1_float, m_inv); float res_00 := result[0][0]; float res_01 := result[0][1]; float res_10 := result[1][0]; float res_11 := result[1][1]; print(res_00); print(res_01); print(res_10); print(res_11)), Block(int error_code := Neg(1); print(error_code)));
-matrix int m2 := MatrixInt((2, 2), ...);
-int det2 := Determinant(m2);
-If(Not(Eq(det2, 0)), Block(float det2_inv := Div(1., det2); float a2 := m2[0][0]; float b2 := m2[0][1]; float c2 := m2[1][0]; float d2 := m2[1][1]; float neg_b2 := Neg(b2); float neg_c2 := Neg(c2); matrix float adj2 := MatrixFloat((2, 2), ...); adj2[0][0] := d2; adj2[0][1] := neg_b2; adj2[1][0] := neg_c2; adj2[1][1] := a2; matrix float m2_inv := ScalarMultiply(det2_inv, adj2); float inv2_00 := m2_inv[0][0]; float inv2_01 := m2_inv[0][1]; float inv2_10 := m2_inv[1][0]; float inv2_11 := m2_inv[1][1]; print(inv2_00); print(inv2_01); print(inv2_10); print(inv2_11)), Block(int error_code := Neg(1); print(error_code)))
+int a := 2
 Running type checking...
 Type checking successful!
 
 Final type environment:
-  det2 : int
-  m2 : matrix<int>[2,2]
-  det : int
-  m1 : matrix<int>[2,2]
+  a : int
 
 Program is well-typed and ready for execution.
