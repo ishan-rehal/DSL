@@ -2,7 +2,6 @@
   open Ast
 %}
 %right UMINUS UPLUS NOT
-
 (* Token declarations; ensure these match your lexer. *)
 %token <int>        INT_LITERAL
 %token <float>      FLOAT_LITERAL
