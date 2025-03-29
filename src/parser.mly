@@ -1,7 +1,6 @@
 %{
   open Ast
 %}
-
 %right UMINUS UPLUS NOT
 
 (* Token declarations; ensure these match your lexer. *)
