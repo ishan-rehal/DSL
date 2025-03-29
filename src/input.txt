@@ -1,0 +1,101 @@
+//* 
+This test case calculates the inverse of a 2x2 matrix
+using available operations in the language
+*//
+
+//* Create the input matrix *//
+matrix int m1 := 2,2 [[4, 7], [2, 6]];
+
+//* Calculate determinant *//
+int det := determinant(m1);
+
+//* Check if matrix is invertible *//
+if not(det == 0) then {
+    //* Prepare inverse calculation *//
+    float det_inv := 1.0 / det;
+    
+    //* For a 2x2 matrix [[a, b], [c, d]], the inverse is (1/det) * [[d, -b], [-c, a]] *//
+    float a := m1[0][0];
+    float b := m1[0][1];
+    float c := m1[1][0];
+    float d := m1[1][1];
+    float neg_b := -b;
+    float neg_c := -c;
+    
+    //* Create adjugate matrix by initializing and assigning elements *//
+    matrix float adj := 2,2 [[0.0, 0.0], [0.0, 0.0]];
+    adj[0][0] := d;
+    adj[0][1] := neg_b;
+    adj[1][0] := neg_c;
+    adj[1][1] := a;
+    
+    //* Multiply by 1/determinant to get inverse *//
+    matrix float m_inv := scalar_multiply(det_inv, adj);
+    
+    //* Print inverse matrix elements *//
+    float inv_00 := m_inv[0][0];
+    float inv_01 := m_inv[0][1];
+    float inv_10 := m_inv[1][0];
+    float inv_11 := m_inv[1][1];
+    
+    //* Print results *//
+    print(inv_00);
+    print(inv_01);
+    print(inv_10);
+    print(inv_11);
+    
+    //* Verify inverse by multiplying original matrix with inverse *//
+    matrix float m1_float := 2,2 [[4.0, 7.0], [2.0, 6.0]];
+    matrix float result := multiplyM(m1_float, m_inv);
+    
+    //* The result should be close to the identity matrix *//
+    float res_00 := result[0][0];
+    float res_01 := result[0][1];
+    float res_10 := result[1][0];
+    float res_11 := result[1][1];
+    
+    print(res_00);
+    print(res_01);
+    print(res_10);
+    print(res_11);
+} else {
+    int error_code := -1;
+    print(error_code);  //* Matrix is not invertible *//
+};
+
+//* Test with another matrix *//
+matrix int m2 := 2,2 [[1, 2], [3, 4]];
+int det2 := determinant(m2);
+
+if (not(det2 == 0)) then {
+    float det2_inv := 1.0 / det2;
+    
+    float a2 := m2[0][0];
+    float b2 := m2[0][1];
+    float c2 := m2[1][0];
+    float d2 := m2[1][1];
+    float neg_b2 := -b2;
+    float neg_c2 := -c2;
+    
+    //* Create adjugate matrix properly *//
+    matrix float adj2 := 2,2 [[0.0, 0.0], [0.0, 0.0]];
+    adj2[0][0] := d2;
+    adj2[0][1] := neg_b2;
+    adj2[1][0] := neg_c2;
+    adj2[1][1] := a2;
+    
+    matrix float m2_inv := scalar_multiply(det2_inv, adj2);
+    
+    float inv2_00 := m2_inv[0][0];
+    float inv2_01 := m2_inv[0][1]; 
+    float inv2_10 := m2_inv[1][0];
+    float inv2_11 := m2_inv[1][1];
+    
+    print(inv2_00);
+    print(inv2_01);
+    print(inv2_10);
+    print(inv2_11);
+} else {
+    int error_code := -1;
+    print(error_code);
+};
