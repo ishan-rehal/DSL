@@ -1,10 +1,36 @@
 
 Parsed AST:
-int a := 2
+int a := 2;
+a := Add(2, 3);
+float b := Sub(Add(2, 3.2), 100);
+bool c := true;
+c := Not(And(Or(c, false), false));
+vector int v1 := VectorInt(3, [1, 2, 3]);
+vector int v2 := VectorInt(3, [1, 2, -3]);
+vector float vf := VectorFloat(3, [1.2, 2.1, 100.]);
+vector int v3 := PlusV(v1, v2);
+int dotp := DotProduct(v1, v2);
+float dotp' := DotProduct(v1, vf);
+float mag := Magnitude(v1);
+b := Abs(b);
+float f := Power(Power(a, 3), Div(1., 3.));
+int l1 := 0;
+If(false, Block(int x := 5; int y := 10), Block(float x := 10.; bool y := false))
 Running type checking...
 Type checking successful!
 
 Final type environment:
+  l1 : int
+  f : float
+  mag : float
+  dotp' : float
+  dotp : int
+  v3 : vector<int>[3]
+  vf : vector<float>[3]
+  v2 : vector<int>[3]
+  v1 : vector<int>[3]
+  c : bool
+  b : float
   a : int
 
 Program is well-typed and ready for execution.

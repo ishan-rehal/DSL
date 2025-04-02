@@ -1,1 +1,27 @@
 int a := 2;
+a := 2 + 3;
+float b := 2 + 3.2 - 100;
+bool c := true;
+c := not ((c || false ) && false);
+vector int v1 := 3 [1,2,3];
+vector int v2 := 3 [1,2,-3];
+vector float vf := 3 [1.2,2.1,1e2];
+vector int v3 := plusV(v1,v2);
+int dotp := dot_product(v1,v2);
+float dotp' := dot_product(v1,vf);
+float mag := magnitude(v1);
+b := abs(b);
+float f := power(power(a,3),1.0/3.0);
+int l1 :=0;
+if false then
+{
+    int x := 5;
+    int y := 10;
+}
+else
+{
+     float x := 10.0;
+     bool y := false;
+     //* y := 10; *//
+};
+
