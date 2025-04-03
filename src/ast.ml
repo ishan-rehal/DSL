@@ -46,6 +46,7 @@ type exptree =
   | MinusM of exptree * exptree
   | MultiplyM of exptree * exptree
   | BlockExp of stmt list
+  | Inverse of exptree
 
 and stmt =
   | DeclareInt of string * exptree

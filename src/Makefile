@@ -15,7 +15,7 @@ GEN_PARSER_MLI = parser.mli
 GEN_LEXER_ML  = lexer.ml
 
 # Object files
-OBJS = ast.cmo typecheck.cmo parser.cmo lexer.cmo interpretor.cmo main.cmo
+OBJS = ast.cmo parser.cmo lexer.cmo typecheck.cmo interpretor.cmo main.cmo
 
 all: $(TARGET)
 
@@ -27,7 +27,7 @@ $(TARGET): $(OBJS)
 ast.cmo: ast.ml
 	$(OCAMLC) -c ast.ml
 
-typecheck.cmo: typecheck.ml ast.cmo
+typecheck.cmo: typecheck.ml ast.cmo parser.cmi lexer.cmo
 	$(OCAMLC) -c typecheck.ml
 
 # Compile parser.mli to generate parser.cmi.

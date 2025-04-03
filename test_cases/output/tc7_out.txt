@@ -1,0 +1,9 @@
+
+Parsed AST:
+vector int v1 := VectorInt(3, [1, 2, 3]);
+vector int v2 := VectorInt(4, [4, 3, 2, 1]);
+vector int v3 := PlusV(v1, v2)
+Running type checking...
+Type Error: Vectors must have same dimension for vector operations
+
+Program contains type errors. Fix them before running.

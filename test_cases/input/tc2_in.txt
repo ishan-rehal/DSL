@@ -1,0 +1,21 @@
+vector int v1 := 4 [1, 2, 3, 4];
+vector int v2 := 4 [4, 3, 2, 1];
+
+vector int sum := plusV(v1, v2);
+vector int diff := minusV(v1, v2);
+
+int dotp := dot_product(v1, v2);
+
+float mag_v1 := magnitude(v1);
+float mag_v2 := magnitude(v2);
+
+vector float scaled_v1 := scalar_multiply(2.5, v1);
+int third_elem := v1[2];
+
+print(sum);
+print(diff);
+print(dotp);
+print(mag_v1);
+print(mag_v2);
+print(scaled_v1);
+print(third_elem);

@@ -58,10 +58,11 @@
 %token              SCALAR_MULTIPLY
 %token              PLUSV
 %token              MINUSV
-%token              MULTIPLYV
+// %token              MULTIPLYV
 %token              PLUSM
 %token              MINUSM
 %token              MULTIPLYM
+%token             INVERSE
 %token              COMMA
 
 %start program
@@ -86,6 +87,7 @@ terminated_statement:
 (* Special rule for for-loop initialization *)
 for_init:
     | INT IDENT ASSIGN expr         { DeclareInt($2, $4) }
+    | FLOAT IDENT ASSIGN expr       { DeclareFloat($2, $4) }
     | IDENT ASSIGN expr             { Assign($1, $3) }
 ;
 
@@ -108,7 +110,6 @@ statement:
                                     { AssignVector($1, $3, $6) }
     | IDENT LBRACKET expr RBRACKET LBRACKET expr RBRACKET ASSIGN expr  
                                     { AssignMatrix($1, $3, $6, $9) }
-    | INPUT LPAREN optional_string RPAREN { InputStmt($3) }
     | PRINT LPAREN optional_ident RPAREN { PrintStmt($3) }
     | expr                          { ExprStmt($1) }
     | statement_block               { Block($1) }
@@ -209,6 +210,8 @@ unary_expr:
 
 (* Primary expressions (literals, variables, function calls, etc.) *)
 primary_expr:
+    | INPUT LPAREN optional_string RPAREN { Input($3) }
+
     | IDENT LBRACKET expr RBRACKET  
                                     { VectorAcess($1, $3) }
     | IDENT LBRACKET expr RBRACKET LBRACKET expr RBRACKET 
@@ -230,6 +233,7 @@ primary_expr:
                                     { MinusM($3, $5) }
     | MULTIPLYM LPAREN expr COMMA expr RPAREN 
                                     { MultiplyM($3, $5) }
+    | INVERSE LPAREN expr RPAREN    { Inverse($3) }
     (* Vector/matrix operations *)
     | ANGLE LPAREN expr COMMA expr RPAREN      { Angle($3, $5) }
     | MAGNITUDE LPAREN expr RPAREN  { Magnitude($3) }

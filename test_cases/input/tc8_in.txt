@@ -1,0 +1,5 @@
+matrix int m1 := 2,2 [[1,2],[3,4]];
+matrix int m2 := 3,2 [[1,2],[3,4],[5,6]];
+
+matrix int result := multiplyM(m1, m2);
+//* Type error: matrix multiplication requires matching dimensions (2 == 3 fails) *//

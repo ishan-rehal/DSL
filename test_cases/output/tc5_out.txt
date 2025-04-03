@@ -1,0 +1,44 @@
+
+Parsed AST:
+float a1 := 2.;
+float b1 := 3.;
+float c1 := 8.;
+float a2 := 1.;
+float b2 := 2.;
+float c2 := 5.;
+float factor := Div(a2, a1);
+float b2_prime := Sub(b2, Mul(factor, b1));
+float c2_prime := Sub(c2, Mul(factor, c1));
+float y := Div(c2_prime, b2_prime);
+float x := Div(Sub(c1, Mul(b1, y)), a1);
+print(x);
+print(y)
+Running type checking...
+Type checking successful!
+
+Final type environment:
+  x : float
+  y : float
+  c2_prime : float
+  b2_prime : float
+  factor : float
+  c2 : float
+  b2 : float
+  a2 : float
+  c1 : float
+  b1 : float
+  a1 : float
+
+Program is well-typed and ready for execution.
+Evaluation complete. Variable values:
+a2 = 1.000000
+b1 = 3.000000
+y = 2.000000
+b2_prime = 0.500000
+b2 = 2.000000
+a1 = 2.000000
+x = 1.000000
+c2_prime = 1.000000
+factor = 0.500000
+c2 = 5.000000
+c1 = 8.000000

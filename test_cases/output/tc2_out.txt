@@ -1,0 +1,43 @@
+
+Parsed AST:
+vector int v1 := VectorInt(4, [1, 2, 3, 4]);
+vector int v2 := VectorInt(4, [4, 3, 2, 1]);
+vector int sum := PlusV(v1, v2);
+vector int diff := MinusV(v1, v2);
+int dotp := DotProduct(v1, v2);
+float mag_v1 := Magnitude(v1);
+float mag_v2 := Magnitude(v2);
+vector float scaled_v1 := ScalarMultiply(2.5, v1);
+int third_elem := v1[2];
+print(sum);
+print(diff);
+print(dotp);
+print(mag_v1);
+print(mag_v2);
+print(scaled_v1);
+print(third_elem)
+Running type checking...
+Type checking successful!
+
+Final type environment:
+  third_elem : int
+  scaled_v1 : vector<float>[4]
+  mag_v2 : float
+  mag_v1 : float
+  dotp : int
+  diff : vector<int>[4]
+  sum : vector<int>[4]
+  v2 : vector<int>[4]
+  v1 : vector<int>[4]
+
+Program is well-typed and ready for execution.
+Evaluation complete. Variable values:
+third_elem = 3
+v1 = [1; 2; 3; 4]
+diff = [-3; -1; 1; 3]
+mag_v1 = 5.477226
+dotp = 20
+sum = [5; 5; 5; 5]
+scaled_v1 = [2.5; 5.; 7.5; 10.]
+mag_v2 = 5.477226
+v2 = [4; 3; 2; 1]

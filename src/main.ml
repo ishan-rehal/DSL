@@ -72,6 +72,7 @@ let rec string_of_exptree expr =
       id ^ "[" ^ string_of_exptree e1 ^ "][" ^ string_of_exptree e2 ^ "]"
   | Power (base, exp) ->
       "Power(" ^ string_of_exptree base ^ ", " ^ string_of_exptree exp ^ ")"
+      | Inverse e -> "Inverse(" ^ string_of_exptree e ^ ")"
 and string_of_stmt stmt =
   match stmt with
   | DeclareInt (id, e) ->
@@ -110,63 +111,101 @@ and string_of_stmt stmt =
       "for(" ^ string_of_stmt init ^ "; " ^ string_of_exptree cond ^ "; " ^
       string_of_stmt update ^ ") { " ^ (String.concat "; " (List.map string_of_stmt body)) ^ " }"
 
-let string_of_program (Program stmts) =
-  String.concat ";\n" (List.map string_of_stmt stmts)
-
-(* Check if the program is well-typed *)
-let check_types prog out_chan =
-  print_both out_chan "Running type checking...";
-  try
-    let final_env = typecheck_program prog in
-    print_both out_chan "Type checking successful!";
-    print_both out_chan "\nFinal type environment:";
-    List.iter (fun (var, ty) ->
-        let str = sprintf "  %s : %s" var (string_of_type ty) in
-        print_endline str;
-        fprintf out_chan "%s\n" str
-      ) final_env;
-    true
-  with
-  | TypecheckError message ->
-      let err_msg = "Type Error: " ^ message in
-      prerr_endline err_msg;
-      fprintf out_chan "%s\n" err_msg;
-      false
-  | e ->
-      let err_msg = "Unexpected error during type checking: " ^ Printexc.to_string e in
-      prerr_endline err_msg;
-      fprintf out_chan "%s\n" err_msg;
-      false
-
-let () =
-  print_endline "Reading from input.txt...";
-  let in_chan = open_in "input.txt" in
-  let out_chan = open_out "output.txt" in
-  (* Define lexbuf outside the try block so it is available in exception handlers *)
-  let lexbuf = Lexing.from_channel in_chan in
-  try
-    let prog = Parser.program Lexer.token lexbuf in
-    close_in in_chan;
-    let ast_str = "\nParsed AST:\n" ^ string_of_program prog in
-    print_endline ast_str;
-    fprintf out_chan "%s\n" ast_str;
-    if check_types prog out_chan then begin
-      print_both out_chan "\nProgram is well-typed and ready for execution.";
-      run_program prog
-    end else
-      print_both out_chan "\nProgram contains type errors. Fix them before running."
-  with
-  | Lexer.Lexing_error msg ->
-      let err_msg = "Lexing error: " ^ msg in
-      prerr_endline err_msg;
-      fprintf out_chan "%s\n" err_msg
-  | Parsing.Parse_error ->
-      let err_msg = "Parsing error at position " ^ string_of_int (Lexing.lexeme_start lexbuf) in
-      prerr_endline err_msg;
-      fprintf out_chan "%s\n" err_msg
-  | e ->
-      let err_msg = "Unexpected error: " ^ Printexc.to_string e in
-      prerr_endline err_msg;
-      fprintf out_chan "%s\n" err_msg;
-  try close_in in_chan with _ -> ();
-  try close_out out_chan with _ -> ()
+      let string_of_program (Program stmts) =
+        String.concat ";\n" (List.map string_of_stmt stmts)
+      
+      (* Check if the program is well-typed *)
+      let check_types ~print_to_console prog out_chan =
+        (* Helper for "write to out_chan, optionally also to console." *)
+        let print_both str =
+          if print_to_console then
+            print_endline str;            (* Print to console if enabled *)
+          Printf.fprintf out_chan "%s\n" str  (* Always write to file *)
+        in
+      
+        print_both "Running type checking...";
+        try
+          let final_env = typecheck_program prog in
+      
+          print_both "Type checking successful!";
+          print_both "\nFinal type environment:";
+      
+          List.iter (fun (var, ty) ->
+            let str = sprintf "  %s : %s" var (string_of_type ty) in
+            print_both str
+          ) final_env;
+      
+          true
+        with
+        | TypecheckError message ->
+            let err_msg = "Type Error: " ^ message in
+            prerr_endline err_msg;               (* Typically print errors to stderr *)
+            Printf.fprintf out_chan "%s\n" err_msg;
+            false
+        | e ->
+            let err_msg = "Unexpected error during type checking: " ^ Printexc.to_string e in
+            prerr_endline err_msg;
+            Printf.fprintf out_chan "%s\n" err_msg;
+            false
+      
+      (* A helper for "print to file, optionally also to console." *)
+      let print_both ~print_to_console out_chan str =
+        if print_to_console then
+          print_endline str;        (* Print to console if desired *)
+        fprintf out_chan "%s\n" str (* Always print to file *)
+      
+      let () =
+        (* Toggle console printing here: set to false to suppress console output,
+           or true to allow console prints. *)
+        let print_to_console = false in
+      
+        if print_to_console then
+          print_endline "Reading from input.txt...";
+      
+        let in_chan = open_in "input.txt" in
+        let out_chan = open_out "output.txt" in
+        let lexbuf = Lexing.from_channel in_chan in
+      
+        try
+          (* 1) Parse the program. *)
+          let prog = Parser.program Lexer.token lexbuf in
+          close_in in_chan;
+      
+          (* 2) Print the parsed AST (optionally to console, always to file). *)
+          let ast_str = "\nParsed AST:\n" ^ string_of_program prog in
+          if print_to_console then
+            print_endline ast_str;
+          fprintf out_chan "%s\n" ast_str;
+      
+          (* 3) Type-check the program, with optional console printing. *)
+          if check_types ~print_to_console prog out_chan then begin
+            (* If the program is well-typed, proceed to execution. *)
+            print_both ~print_to_console out_chan "\nProgram is well-typed and ready for execution.";
+      
+            (* 4) Run the program, passing the same toggle for console printing. *)
+            run_program out_chan ~print_to_console prog
+          end else
+            print_both ~print_to_console out_chan
+              "\nProgram contains type errors. Fix them before running."
+      
+        with
+        | Lexer.Lexing_error msg ->
+            let err_msg = "Lexing error: " ^ msg in
+            prerr_endline err_msg;
+            fprintf out_chan "%s\n" err_msg
+        | Parsing.Parse_error ->
+            let err_msg = "Parsing error at position "
+                          ^ string_of_int (Lexing.lexeme_start lexbuf) in
+            prerr_endline err_msg;
+            fprintf out_chan "%s\n" err_msg
+        | e ->
+            let err_msg = "Unexpected error: " ^ Printexc.to_string e in
+            prerr_endline err_msg;
+            fprintf out_chan "%s\n" err_msg;
+      
+        (* Clean up channels. *)
+        try close_in in_chan with _ -> ();
+        try close_out out_chan with _ -> ();
+        ()
+        (* End of main.ml *)
+        

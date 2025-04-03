@@ -1,6 +1,10 @@
 (* typecheck.ml *)
 open Ast
+open Parser
+open Lexer
+open Printf
 
+(* Typecheck module for the language *)
 (* Custom exception for type errors *)
 exception TypecheckError of string
 
@@ -163,12 +167,12 @@ let rec type_of_expr env expr =
      | TInt -> TInt
      | TFloat -> TFloat
      | t -> type_error ("abs requires numeric type, got: " ^ string_of_type t))
-  
-     | Pos e ->
-      let t = type_of_expr env e in
-      if t = TInt || t = TFloat then t
-      else type_error ("Unary plus expects numeric type, got: " ^ string_of_type t)
-  
+
+  | Pos e ->
+    let t = type_of_expr env e in
+    if t = TInt || t = TFloat then t
+    else type_error ("Unary plus expects numeric type, got: " ^ string_of_type t)
+
 
 
   | Neg e ->
@@ -232,17 +236,17 @@ let rec type_of_expr env expr =
       type_of_expr env' body
 
   | Angle (e1, e2) ->
-        (match type_of_expr env e1, type_of_expr env e2 with
-         | (TVectorInt d1, TVectorInt d2) when d1 = d2 -> TFloat
-         | (TVectorFloat d1, TVectorFloat d2) when d1 = d2 -> TFloat
-         | (TVectorInt d1, TVectorFloat d2) when d1 = d2 -> TFloat
-         | (TVectorFloat d1, TVectorInt d2) when d1 = d2 -> TFloat
-         | (TVectorInt _, TVectorInt _) | (TVectorFloat _, TVectorFloat _) -> 
-             type_error "Vectors must have same dimension for angle calculation"
-         | (t1, _) when not (match t1 with TVectorInt _ | TVectorFloat _ -> true | _ -> false) -> 
-             type_error ("First argument to angle must be a vector, got: " ^ string_of_type t1)
-         | (_, t2) -> 
-             type_error ("Second argument to angle must be a vector, got: " ^ string_of_type t2))
+    (match type_of_expr env e1, type_of_expr env e2 with
+     | (TVectorInt d1, TVectorInt d2) when d1 = d2 -> TFloat
+     | (TVectorFloat d1, TVectorFloat d2) when d1 = d2 -> TFloat
+     | (TVectorInt d1, TVectorFloat d2) when d1 = d2 -> TFloat
+     | (TVectorFloat d1, TVectorInt d2) when d1 = d2 -> TFloat
+     | (TVectorInt _, TVectorInt _) | (TVectorFloat _, TVectorFloat _) -> 
+       type_error "Vectors must have same dimension for angle calculation"
+     | (t1, _) when not (match t1 with TVectorInt _ | TVectorFloat _ -> true | _ -> false) -> 
+       type_error ("First argument to angle must be a vector, got: " ^ string_of_type t1)
+     | (_, t2) -> 
+       type_error ("Second argument to angle must be a vector, got: " ^ string_of_type t2))
 
   | Magnitude e ->
     (match type_of_expr env e with
@@ -288,12 +292,12 @@ let rec type_of_expr env expr =
      | TInt, TVectorInt d -> TVectorInt d
      | TFloat, TVectorFloat d -> TVectorFloat d
      | TInt, TVectorFloat d | TFloat, TVectorInt d -> TVectorFloat d
-     
+
      (* Matrix cases - add these *)
      | TInt, TMatrixInt (r, c) -> TMatrixInt (r, c)
      | TFloat, TMatrixFloat (r, c) -> TMatrixFloat (r, c)
      | TInt, TMatrixFloat (r, c) | TFloat, TMatrixInt (r, c) -> TMatrixFloat (r, c)
-     
+
      (* Error cases *)
      | _, (TVectorInt _ | TVectorFloat _ | TMatrixInt _ | TMatrixFloat _) -> 
        type_error ("First arg to scalar_multiply must be numeric, got: " ^ string_of_type scalar_t)
@@ -316,12 +320,31 @@ let rec type_of_expr env expr =
   | PlusM (m1, m2) -> check_matrix_add_op type_of_expr env m1 m2
   | MinusM (m1, m2) -> check_matrix_add_op type_of_expr env m1 m2
   | MultiplyM (m1, m2) -> check_matrix_multiply_op type_of_expr env m1 m2
+  | Inverse e ->
+    (match type_of_expr env e with
+     | TMatrixInt (r, c) when r = c -> TMatrixInt (r, c)
+     | TMatrixFloat (r, c) when r = c -> TMatrixFloat (r, c)
+     | _ -> type_error "Inverse requires a square matrix")
+
+  (* Handle block expressions and input/output *)
 
   | BlockExp stmts ->
     let _ = List.fold_left typecheck_stmt env stmts in
     TUnit  (* Would require adding a TUnit constructor to data_type *)
 
-  | Input _ | Print _ -> TInt  (* Input/output operations return success code *)
+    | Input s ->
+      if s = "" then 
+        type_error "Input: file name cannot be empty (terminal input not allowed)"
+      else
+        let chan = open_in s in
+        let lexbuf = Lexing.from_channel chan in
+        let prog = Parser.program Lexer.token lexbuf in
+        close_in chan;
+        (match prog with
+         | Program [ExprStmt e] -> type_of_expr env e
+         | _ -> type_error "Input file must yield a single constant expression")
+  
+    | Print _ -> TInt  (* Input/output operations return success code *)
 
 
 (* Type check a statement and return the updated environment *)
@@ -334,13 +357,13 @@ and typecheck_stmt env stmt =
     else
       type_error ("Expected int but got " ^ string_of_type t ^ " in declaration of " ^ id)
 
-(* Update DeclareFloat pattern *)
-| DeclareFloat (id, e) ->
-  let t = type_of_expr env e in
-  if t = TFloat || t = TInt then  (* Allow int promotion *)
-    (id, TFloat) :: env
-  else
-    type_error ("Expected float or int but got " ^ string_of_type t ^ " in declaration of " ^ id)
+  (* Update DeclareFloat pattern *)
+  | DeclareFloat (id, e) ->
+    let t = type_of_expr env e in
+    if t = TFloat || t = TInt then  (* Allow int promotion *)
+      (id, TFloat) :: env
+    else
+      type_error ("Expected float or int but got " ^ string_of_type t ^ " in declaration of " ^ id)
 
 
   | DeclareBool (id, e) ->
@@ -357,13 +380,13 @@ and typecheck_stmt env stmt =
      | _ -> type_error ("Expected vector<int> but got " ^ string_of_type t ^ " in declaration of " ^ id))
 
 
-(* Update DeclareVectorFloat pattern *)
-| DeclareVectorFloat (id, e) ->
-  let t = type_of_expr env e in
-  (match t with
-   | TVectorFloat dim -> (id, TVectorFloat dim) :: env
-   | TVectorInt dim -> (id, TVectorFloat dim) :: env  (* Allow int->float vector promotion *)
-   | _ -> type_error ("Expected vector<float> but got " ^ string_of_type t ^ " in declaration of " ^ id))
+  (* Update DeclareVectorFloat pattern *)
+  | DeclareVectorFloat (id, e) ->
+    let t = type_of_expr env e in
+    (match t with
+     | TVectorFloat dim -> (id, TVectorFloat dim) :: env
+     | TVectorInt dim -> (id, TVectorFloat dim) :: env  (* Allow int->float vector promotion *)
+     | _ -> type_error ("Expected vector<float> but got " ^ string_of_type t ^ " in declaration of " ^ id))
 
   | DeclareMatrixInt (id, e) ->
     let t = type_of_expr env e in
@@ -371,13 +394,13 @@ and typecheck_stmt env stmt =
      | TMatrixInt (r, c) -> (id, TMatrixInt (r, c)) :: env
      | _ -> type_error ("Expected matrix<int> but got " ^ string_of_type t ^ " in declaration of " ^ id))
 
-(* Update DeclareMatrixFloat pattern *)
-| DeclareMatrixFloat (id, e) ->
-  let t = type_of_expr env e in
-  (match t with
-   | TMatrixFloat (r, c) -> (id, TMatrixFloat (r, c)) :: env
-   | TMatrixInt (r, c) -> (id, TMatrixFloat (r, c)) :: env  (* Allow int->float matrix promotion *)
-   | _ -> type_error ("Expected matrix<float> but got " ^ string_of_type t ^ " in declaration of " ^ id))
+  (* Update DeclareMatrixFloat pattern *)
+  | DeclareMatrixFloat (id, e) ->
+    let t = type_of_expr env e in
+    (match t with
+     | TMatrixFloat (r, c) -> (id, TMatrixFloat (r, c)) :: env
+     | TMatrixInt (r, c) -> (id, TMatrixFloat (r, c)) :: env  (* Allow int->float matrix promotion *)
+     | _ -> type_error ("Expected matrix<float> but got " ^ string_of_type t ^ " in declaration of " ^ id))
 
   | Assign (id, e) ->
     let var_type = 
@@ -390,66 +413,66 @@ and typecheck_stmt env stmt =
     else type_error ("Cannot assign " ^ string_of_type expr_type ^ " to " ^ id ^ 
                      " (variable type: " ^ string_of_type var_type ^ ")")
 
-(* Update vector element assignment handling *)
-| AssignVector (id, idx, val_expr) ->
-  let vec_type = 
-    try List.assoc id env 
-    with Not_found -> type_error ("Vector " ^ id ^ " not declared before assignment")
-  in
-  let idx_type = type_of_expr env idx in
-  if idx_type <> TInt then
-    type_error ("Vector index must be an integer, got: " ^ string_of_type idx_type)
-  else
-   ( match vec_type with
-    | TVectorInt _ -> 
-        let val_type = type_of_expr env val_expr in
-        if val_type <> TInt then
-          type_error ("Cannot assign " ^ string_of_type val_type ^ " to element of vector<int>")
-        else env
-    | TVectorFloat _ ->
-        let val_type = type_of_expr env val_expr in
-        if not (compatible TFloat val_type) then  (* This line now allows int elements for float vectors *)
-          type_error ("Cannot assign " ^ string_of_type val_type ^ " to element of vector<float>")
-        else env
-    | _ -> type_error (id ^ " is not a vector"))
+  (* Update vector element assignment handling *)
+  | AssignVector (id, idx, val_expr) ->
+    let vec_type = 
+      try List.assoc id env 
+      with Not_found -> type_error ("Vector " ^ id ^ " not declared before assignment")
+    in
+    let idx_type = type_of_expr env idx in
+    if idx_type <> TInt then
+      type_error ("Vector index must be an integer, got: " ^ string_of_type idx_type)
+    else
+      ( match vec_type with
+        | TVectorInt _ -> 
+          let val_type = type_of_expr env val_expr in
+          if val_type <> TInt then
+            type_error ("Cannot assign " ^ string_of_type val_type ^ " to element of vector<int>")
+          else env
+        | TVectorFloat _ ->
+          let val_type = type_of_expr env val_expr in
+          if not (compatible TFloat val_type) then  (* This line now allows int elements for float vectors *)
+            type_error ("Cannot assign " ^ string_of_type val_type ^ " to element of vector<float>")
+          else env
+        | _ -> type_error (id ^ " is not a vector"))
 
-(* Update matrix element assignment handling *)
-| AssignMatrix (id, row_idx, col_idx, val_expr) ->
-  let mat_type = 
-    try List.assoc id env 
-    with Not_found -> type_error ("Matrix " ^ id ^ " not declared before assignment")
-  in
-  let row_type = type_of_expr env row_idx in
-  let col_type = type_of_expr env col_idx in
-  
-  if row_type <> TInt || col_type <> TInt then
-    type_error "Matrix indices must be integers"
-  else
-    (match mat_type with
-    | TMatrixInt _ -> 
-        let val_type = type_of_expr env val_expr in
-        if val_type <> TInt then
-          type_error ("Cannot assign " ^ string_of_type val_type ^ " to element of matrix<int>")
-        else env
-    | TMatrixFloat _ ->
-        let val_type = type_of_expr env val_expr in
-        if not (compatible TFloat val_type) then  (* This line now allows int elements for float matrices *)
-          type_error ("Cannot assign " ^ string_of_type val_type ^ " to element of matrix<float>")
-        else env
-    | _ -> type_error (id ^ " is not a matrix"))
+  (* Update matrix element assignment handling *)
+  | AssignMatrix (id, row_idx, col_idx, val_expr) ->
+    let mat_type = 
+      try List.assoc id env 
+      with Not_found -> type_error ("Matrix " ^ id ^ " not declared before assignment")
+    in
+    let row_type = type_of_expr env row_idx in
+    let col_type = type_of_expr env col_idx in
+
+    if row_type <> TInt || col_type <> TInt then
+      type_error "Matrix indices must be integers"
+    else
+      (match mat_type with
+       | TMatrixInt _ -> 
+         let val_type = type_of_expr env val_expr in
+         if val_type <> TInt then
+           type_error ("Cannot assign " ^ string_of_type val_type ^ " to element of matrix<int>")
+         else env
+       | TMatrixFloat _ ->
+         let val_type = type_of_expr env val_expr in
+         if not (compatible TFloat val_type) then  (* This line now allows int elements for float matrices *)
+           type_error ("Cannot assign " ^ string_of_type val_type ^ " to element of matrix<float>")
+         else env
+       | _ -> type_error (id ^ " is not a matrix"))
 
   | InputStmt _  ->
     env  (* These don't affect the type environment *)
 
   | PrintStmt opt_id ->
-      (match opt_id with
-       | None -> env  (* Empty print statement is valid *)
-       | Some id -> 
-           try 
-             let _ = List.assoc id env in  (* Check if identifier exists *)
-             env  (* Return unchanged environment if identifier exists *)
-           with Not_found -> 
-             type_error ("Print statement refers to undefined variable: " ^ id))
+    (match opt_id with
+     | None -> env  (* Empty print statement is valid *)
+     | Some id -> 
+       try 
+         let _ = List.assoc id env in  (* Check if identifier exists *)
+         env  (* Return unchanged environment if identifier exists *)
+       with Not_found -> 
+         type_error ("Print statement refers to undefined variable: " ^ id))
 
 
   | ExprStmt e ->

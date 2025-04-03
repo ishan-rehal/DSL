@@ -1,0 +1,8 @@
+vector int arr := input("in.txt");
+int sum := 0;
+int n := dimension(arr);
+for (int i := 0 ; i < n ; i := i + 1)
+{
+    sum := sum + arr[i];
+};
+print(sum);

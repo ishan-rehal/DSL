@@ -1,0 +1,33 @@
+
+Parsed AST:
+matrix float A := MatrixFloat((3, 3), ...);
+matrix float B := MatrixFloat((3, 1), ...);
+float det := Determinant(A);
+If(Less(Abs(det), 1e-10), Block(int minusone := Neg(1); print(minusone)), Block(matrix float A_inv := Inverse(A); matrix float X := MultiplyM(A_inv, B); print(X)))
+Running type checking...
+Type checking successful!
+
+Final type environment:
+  det : float
+  B : matrix<float>[3,1]
+  A : matrix<float>[3,3]
+
+Program is well-typed and ready for execution.
+Evaluation complete. Variable values:
+X = MatrixFloat (3 x 1):
+1.31818181818
+1.20454545455
+1.25
+det = 44.000000
+A = MatrixFloat (3 x 3):
+2.; 3.; -1.
+-1.; 4.; 2.
+3.; -1.; 1.
+A_inv = MatrixFloat (3 x 3):
+0.136363636364; -0.0454545454545; 0.227272727273
+0.159090909091; 0.113636363636; -0.0681818181818
+-0.25; 0.25; 0.25
+B = MatrixFloat (3 x 1):
+5.
+6.
+4.

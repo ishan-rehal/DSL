@@ -96,11 +96,19 @@ let float_number_scientific =
   ( float_number (['e' 'E'] sign? number)? )
 | ( number (['e' 'E'] sign? number) )
 
+let signed_float_number_scientific = sign? float_number_scientific
+
+let row_float =
+  "[" h_whitespace?
+      signed_float_number_scientific
+      (h_whitespace* "," h_whitespace* signed_float_number_scientific)*
+      h_whitespace?
+   "]"
 (* For float vectors *)
 let float_vec_body =
   "[" h_whitespace?
-      float_number_scientific
-      (h_whitespace* "," h_whitespace* float_number_scientific)*
+      signed_float_number_scientific
+      (h_whitespace* "," h_whitespace* signed_float_number_scientific)*
      h_whitespace? "]"
 
 let int_vec_body =
@@ -119,8 +127,8 @@ let row_int =
 
 let row_float =
   "[" h_whitespace?
-      float_number_scientific
-      (h_whitespace* "," h_whitespace* float_number_scientific)*
+      signed_float_number_scientific
+      (h_whitespace* "," h_whitespace* signed_float_number_scientific)*
       h_whitespace?
    "]"
 
@@ -172,6 +180,7 @@ rule token = parse
   | "multiplyM"   { MULTIPLYM }
   | "dot_product"{ DOT_PRODUCT }
   | "scalar_multiply" { SCALAR_MULTIPLY }
+  | "inverse"   { INVERSE }
 
   (* Comma *)
   | ","           { COMMA }

@@ -1,0 +1,25 @@
+//* 
+Solve the 2x2 system of linear equations:
+Equation 1: 2*x + 3*y = 8
+Equation 2: 1*x + 2*y = 5
+*//
+
+float a1 := 2.0;
+float b1 := 3.0;
+float c1 := 8.0;
+
+float a2 := 1.0;
+float b2 := 2.0;
+float c2 := 5.0;
+
+//* Perform Gaussian elimination *//
+float factor := a2 / a1;
+float b2_prime := b2 - factor * b1;
+float c2_prime := c2 - factor * c1;
+
+//* Solve for y and back substitute for x *//
+float y := c2_prime / b2_prime;
+float x := (c1 - b1 * y) / a1;
+
+print(x);
+print(y);

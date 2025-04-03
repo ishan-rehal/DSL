@@ -1,0 +1,15 @@
+
+Parsed AST:
+int x := 10;
+int y := 0;
+int z := Div(x, y)
+Running type checking...
+Type checking successful!
+
+Final type environment:
+  z : int
+  y : int
+  x : int
+
+Program is well-typed and ready for execution.
+Unexpected error: Failure("Division by zero")

@@ -1,0 +1,20 @@
+matrix int A := 2,2
+[[1,2],[3,4]];
+matrix int B := 2,2
+[[2,0],[1,2]];
+matrix int prod := multiplyM(A, B);
+
+matrix int ident := 2,2
+[[1,0],[0,1]];
+matrix int square_ident := multiplyM(ident, ident);
+
+matrix int scaled_A := scalar_multiply(3, A);
+
+matrix float C := 2,2
+[[1.0,2.0],[3.0,4.0]];
+matrix float invC := inverse(C);
+
+print(prod);
+print(square_ident);
+print(scaled_A);
+print(invC);

@@ -1,0 +1,37 @@
+
+Parsed AST:
+int a := 10;
+float b := 20.5;
+a := Add(a, Mul(5, Sub(2, 3)));
+b := Add(Div(b, 2.), Power(a, 2));
+float c := Add(Abs(Sub(b, 100)), 3.1415);
+If(Less(a, 10), Block(int d := Mul(a, 2); float e := Sub(b, 10.)), Block(int d := Sub(a, 3); float e := Add(b, 10.)));
+int sum := 0;
+For(int i := 1, LessEq(i, 10), i := Add(i, 1), Block(sum := Add(sum, i)));
+float product := 1.;
+int counter := 1;
+While(LessEq(counter, 5), Block(product := Mul(product, counter); counter := Add(counter, 1)));
+print(sum);
+print(product)
+Running type checking...
+Type checking successful!
+
+Final type environment:
+  counter : int
+  product : float
+  sum : int
+  c : float
+  b : float
+  a : int
+
+Program is well-typed and ready for execution.
+Evaluation complete. Variable values:
+a = 5
+d = 10
+counter = 6
+e = 25.250000
+b = 35.250000
+sum = 55
+product = 120.000000
+c = 67.891500
+i = 11

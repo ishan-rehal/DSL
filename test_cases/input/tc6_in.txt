@@ -1,0 +1,25 @@
+//* 
+Solve the 3x3 system of linear equations:
+2x + 3y - z = 5
+-x + 4y + 2z = 6
+3x - y + z = 4
+*//
+
+matrix float A := 3,3 [[2.0, 3.0, -1.0],[-1.0, 4.0, 2.0],[3.0, -1.0, 1.0]];
+
+matrix float B := 3,1
+[[5.0],[6.0],[4.0]];
+
+float det := determinant(A);
+
+if abs(det) < 1e-10 then
+{
+    int minusone := -1;
+    print(minusone);
+}
+else
+{
+    matrix float A_inv := inverse(A);
+    matrix float X := multiplyM(A_inv, B);
+    print(X);
+};

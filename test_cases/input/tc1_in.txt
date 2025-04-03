@@ -1,0 +1,29 @@
+int a := 10;
+float b := 20.5;
+a := a + 5 * (2 - 3);
+b := b / 2.0 + power(a, 2);
+float c := abs(b - 100) + 3.1415;
+if a < 10 then
+{
+    int d := a * 2;
+    float e := b - 10.0;
+}
+else
+{
+    int d := a - 3;
+    float e := b + 10.0;
+};
+int sum := 0;
+for (int i := 1 ; i <= 10 ; i := i + 1)
+{
+    sum := sum + i;
+};
+float product := 1.0;
+int counter := 1;
+while counter <= 5
+{
+    product := product * counter;
+    counter := counter + 1;
+};
+print(sum);
+print(product);

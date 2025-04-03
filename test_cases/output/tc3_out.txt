@@ -1,0 +1,53 @@
+
+Parsed AST:
+matrix int A := MatrixInt((2, 2), ...);
+matrix int B := MatrixInt((2, 2), ...);
+matrix int prod := MultiplyM(A, B);
+matrix int ident := MatrixInt((2, 2), ...);
+matrix int square_ident := MultiplyM(ident, ident);
+matrix int scaled_A := ScalarMultiply(3, A);
+matrix float C := MatrixFloat((2, 2), ...);
+matrix float invC := Inverse(C);
+print(prod);
+print(square_ident);
+print(scaled_A);
+print(invC)
+Running type checking...
+Type checking successful!
+
+Final type environment:
+  invC : matrix<float>[2,2]
+  C : matrix<float>[2,2]
+  scaled_A : matrix<int>[2,2]
+  square_ident : matrix<int>[2,2]
+  ident : matrix<int>[2,2]
+  prod : matrix<int>[2,2]
+  B : matrix<int>[2,2]
+  A : matrix<int>[2,2]
+
+Program is well-typed and ready for execution.
+Evaluation complete. Variable values:
+scaled_A = MatrixInt (2 x 2):
+3; 6
+9; 12
+ident = MatrixInt (2 x 2):
+1; 0
+0; 1
+C = MatrixFloat (2 x 2):
+1.; 2.
+3.; 4.
+A = MatrixInt (2 x 2):
+1; 2
+3; 4
+invC = MatrixFloat (2 x 2):
+-2.; 1.
+1.5; -0.5
+prod = MatrixInt (2 x 2):
+4; 4
+10; 8
+square_ident = MatrixInt (2 x 2):
+1; 0
+0; 1
+B = MatrixInt (2 x 2):
+2; 0
+1; 2

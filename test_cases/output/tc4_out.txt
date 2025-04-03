@@ -1,0 +1,21 @@
+
+Parsed AST:
+vector int arr := Input(in.txt);
+int sum := 0;
+int n := Dimension(arr);
+For(int i := 0, Less(i, n), i := Add(i, 1), Block(sum := Add(sum, arr[i])));
+print(sum)
+Running type checking...
+Type checking successful!
+
+Final type environment:
+  n : int
+  sum : int
+  arr : vector<int>[5]
+
+Program is well-typed and ready for execution.
+Evaluation complete. Variable values:
+n = 5
+arr = [1; 2; 3; 4; 5]
+sum = 15
+i = 5

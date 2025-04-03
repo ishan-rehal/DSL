@@ -1,0 +1,70 @@
+float me int assign se int store hora..
+
+
+vector int new_var := input("in.txt");
+
+
+
+int a := 2;
+a := 2 + 3;
+float b := 2 + 3.2 - 100;
+bool c := true;
+c := not ((c || false ) && false);
+vector int v1 := 3 [1,2,3];
+vector int v2 := 3 [1,2,-3];
+vector float vf := 3 [1.2,2.1,1e2];
+vector int v3 := plusV(v1,v2);
+int dotp := dot_product(v1,v2);
+float dotp' := dot_product(v1,vf);
+float mag := magnitude(v1);
+b := abs(b);
+float f := power(power(a,3),1.0/3.0);
+int l1 := 0;
+if false then
+{
+    int x := 5;
+    int y := 10;
+}
+else
+{
+     float x := 10.0;
+     bool y := false;
+     //*
+     This is a comment 
+     y := 10;
+     *//
+};
+
+matrix int m1 := 3,2
+[[1,2],[2,3],[3,4]];
+matrix int m2 := 2,3
+[[1,0,0],[0,0,1]];
+matrix int mp := multiplyM(m1,m2);
+matrix int ident := 3,3
+[[1,0,0],[0,1,0],[0,0,1]];
+matrix int ident := multiplyM(ident,ident);
+matrix float fm := 3,3
+[[1.0,2.0,3.0],[1.0,2.0,3.0],[1.0,2.0,3.0]];
+matrix float fm_ := multiplyM(ident,fm);
+
+float i := 0;
+while i < 1e4
+{
+    i := i + 1;
+};
+
+vector float sp := scalar_multiply(10.1, 3 [1,2,3]);
+matrix int spm := scalar_multiply(10, m1);
+
+float var := sp[1] + m1[0][1];
+
+for (int j := 10 ; j > -100 ; j := j-1)
+{
+    print(j);
+};
+
+float finp := 10.0;
+finp := finp/3;
+
+matrix int wow := inverse(ident);
+

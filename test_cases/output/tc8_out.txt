@@ -1,0 +1,9 @@
+
+Parsed AST:
+matrix int m1 := MatrixInt((2, 2), ...);
+matrix int m2 := MatrixInt((3, 2), ...);
+matrix int result := MultiplyM(m1, m2)
+Running type checking...
+Type Error: Matrix multiplication requires compatible dimensions (cols of first = rows of second)
+
+Program contains type errors. Fix them before running.
